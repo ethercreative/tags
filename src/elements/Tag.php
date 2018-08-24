@@ -37,18 +37,27 @@ class Tag extends \craft\elements\Tag
 
 	protected static function defineSources (string $context = null): array
 	{
-		return array_merge(
+		$sources = [
 			[
-				[
-					'key'   => '*',
-					'label' => \Craft::t('app', 'All Tags'),
-				],
-				[
-					'heading' => \Craft::t('app', 'Groups'),
-				]
+				'key'   => '*',
+				'label' => \Craft::t('app', 'All Tags'),
 			],
-			parent::defineSources($context)
-		);
+			[
+				'heading' => \Craft::t('app', 'Groups'),
+			]
+		];
+
+		foreach (\Craft::$app->getTags()->getAllTagGroups() as $tagGroup)
+		{
+			$sources[] = [
+				'key'      => 'taggroup:' . $tagGroup->id,
+				'label'    => \Craft::t('site', $tagGroup->name),
+				'data'     => ['handle' => $tagGroup->handle],
+				'criteria' => ['groupId' => $tagGroup->id],
+			];
+		}
+
+		return $sources;
 	}
 
 	protected static function defineTableAttributes (): array

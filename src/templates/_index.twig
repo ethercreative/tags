@@ -3,6 +3,8 @@
 {% set title = "Tags"|t %}
 {% set elementType = 'ether\\tagManager\\elements\\Tag' %}
 
+{% do view.registerAssetBundle("ether\\tagManager\\web\\assets\\index\\TagIndexAsset") %}
+
 {% block actionButton %}
 	<div class="btngroup">
 		<a href="{{ url('tags/new') }}" class="btn submit add icon">New Tag</a>
@@ -22,7 +24,6 @@
 	</div>
 {% endblock %}
 
-{# TODO FIXME #}
 {% if groupHandle is defined %}
 	{% js %}
 		window.defaultGroupHandle = '{{ groupHandle }}';
