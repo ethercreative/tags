@@ -1,0 +1,30 @@
+{% extends "_layouts/elementindex" %}
+
+{% set title = "Tags"|t %}
+{% set elementType = 'ether\\tagManager\\elements\\Tag' %}
+
+{% block actionButton %}
+	<div class="btngroup">
+		<a href="{{ url('tags/new') }}" class="btn submit add icon">New Tag</a>
+
+		<div class="btn submit menubtn"></div>
+		<div class="menu">
+			<ul>
+				{% for group in craft.app.tags.allTagGroups %}
+					<li>
+						<a href="{{ url("tags/#{group.handle}/new") }}">
+							{{ group.name }}
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+{% endblock %}
+
+{# TODO FIXME #}
+{% if groupHandle is defined %}
+	{% js %}
+		window.defaultGroupHandle = '{{ groupHandle }}';
+	{% endjs %}
+{% endif %}

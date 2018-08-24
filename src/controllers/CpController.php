@@ -8,7 +8,13 @@
 
 namespace ether\tagManager\controllers;
 
+use craft\elements\Tag;
+use craft\errors\InvalidElementException;
+use craft\helpers\DateTimeHelper;
+use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Class Controller
@@ -19,9 +25,261 @@ use craft\web\Controller;
 class CpController extends Controller
 {
 
-	public function actionEdit ()
+	/**
+	 * @param string      $groupHandle
+	 * @param int|null    $tagId
+	 * @param string|null $siteHandle
+	 *
+	 * @return \yii\web\Response
+	 * @throws NotFoundHttpException
+	 */
+	public function actionEdit (
+		string $groupHandle,
+		int $tagId = null,
+		string $siteHandle = null
+	) {
+		$variables = [
+			'tagId'        => $tagId,
+			'fullPageForm' => true,
+		];
+
+		// Get Site
+		if ($siteHandle !== null)
+		{
+			$variables['site'] =
+				\Craft::$app->getSites()->getSiteByHandle($siteHandle);
+
+			if (!$variables['site'])
+				throw new NotFoundHttpException(
+					'Invalid site handle: ' . $siteHandle
+				);
+		}
+		else
+		{
+			$variables['site'] = \Craft::$app->sites->primarySite;
+		}
+
+		// Get Group
+		$variables['group'] =
+			\Craft::$app->tags->getTagGroupByHandle($groupHandle);
+
+		if (empty($variables['group']))
+			throw new NotFoundHttpException('Tag Group not found');
+
+		// Breadcrumbs
+		$variables['crumbs'] = [
+			[
+				'label' => \Craft::t('app', 'Tags'),
+				'url'   => UrlHelper::url('tags')
+			]
+		];
+
+		// Tag
+		if ($tagId) {
+			$variables['tag'] = \Craft::$app->tags->getTagById(
+				$tagId,
+				$variables['site']->id
+			);
+			if (!$variables['tag'])
+				throw new NotFoundHttpException('Tag not found');
+
+			$variables['title'] = $variables['tag']->title;
+
+			$group = $variables['tag']->group;
+			$variables['crumbs'][] = [
+				'label' => $group->name,
+				'url'   => UrlHelper::cpUrl('tags/' . $group->handle),
+			];
+		} else {
+			$variables['tag'] = new Tag();
+			$variables['tag']->siteId  = $variables['site']->id;
+			$variables['tag']->groupId = $variables['group']->id;
+
+			$variables['title'] = \Craft::t('app', 'Create a new tag');
+		}
+
+		// Urls
+		$variables['nextTagUrl'] = UrlHelper::url(
+			'tags/' . $variables['group']->handle . '/new'
+		);
+		$variables['continueEditingUrl'] = 'tags/{group.handle}/{id}';
+
+		if (\Craft::$app->isMultiSite)
+		{
+			$variables['continueEditingUrl'] .= '/{site.handle}';
+			$variables['nextTagUrl'] .= '/' . $variables['site']->handle;
+		}
+
+		$variables['saveShortcutRedirect'] = $variables['continueEditingUrl'];
+
+		return $this->renderTemplate('tag-manager/_edit', $variables);
+	}
+
+	/**
+	 * @return null|\yii\web\Response
+	 * @throws NotFoundHttpException
+	 * @throws ServerErrorHttpException
+	 * @throws \Throwable
+	 * @throws \craft\errors\ElementNotFoundException
+	 * @throws \craft\errors\MissingComponentException
+	 * @throws \yii\base\Exception
+	 * @throws \yii\web\BadRequestHttpException
+	 */
+	public function actionSave ()
 	{
-		return "hi";
+		$this->requirePostRequest();
+		$request = \Craft::$app->request;
+
+		$tagId = $request->getBodyParam('tagId');
+		$siteId = $request->getBodyParam('siteId');
+
+		// Get Tag
+		if ($tagId)
+		{
+			$tag = \Craft::$app->tags->getTagById($tagId, $siteId);
+
+			if (!$tag)
+				throw new NotFoundHttpException('Tag not found');
+		}
+		else
+		{
+			$tag = new Tag();
+			$tag->groupId = \Craft::$app->request->getRequiredBodyParam('groupId');
+
+			if ($siteId)
+				$tag->siteId = $siteId;
+		}
+
+		// Duplicate?
+		if ((bool) $request->getBodyParam('duplicate'))
+		{
+			try {
+				$tag = \Craft::$app->elements->duplicateElement($tag);
+			} catch (InvalidElementException $e) {
+				/** @var Tag $clone */
+				$clone = $e->element;
+
+				if ($request->getAcceptsJson())
+					return $this->asJson([
+						'success' => false,
+						'errors'  => $clone->getErrors(),
+					]);
+
+				\Craft::$app->session->setError(
+					\Craft::t('app', 'Couldn’t duplicate tag.')
+				);
+
+				$tag->addErrors($clone->getErrors());
+				\Craft::$app->urlManager->setRouteParams([
+					'tag' => $tag,
+				]);
+
+				return null;
+			} catch (\Throwable $e) {
+				throw new ServerErrorHttpException(
+					\Craft::t('app', 'An error occurred when duplicating the tag.'),
+					0,
+					$e
+				);
+			}
+		}
+
+		// Populate
+		$tag->title = $request->getBodyParam('title', $tag->title);
+		$tag->setFieldValuesFromRequest(
+			$request->getParam('fieldsLocation', 'fields')
+		);
+
+		// Save
+		if (!\Craft::$app->elements->saveElement($tag))
+		{
+			if ($request->getAcceptsJson())
+				return $this->asJson([
+					'errors' => $tag->getErrors(),
+				]);
+
+			\Craft::$app->getSession()->setError(
+				\Craft::t('app', 'Couldn’t save tag.')
+			);
+
+			// Send the entry back to the template
+			\Craft::$app->getUrlManager()->setRouteParams([
+				'tag' => $tag
+			]);
+
+			return null;
+		}
+
+		if ($request->getAcceptsJson())
+		{
+			$return = [];
+
+			$return['success'] = true;
+			$return['id']      = $tag->id;
+			$return['title']   = $tag->title;
+
+			if ($request->getIsCpRequest())
+				$return['cpEditUrl'] = $tag->getCpEditUrl();
+
+			$return['dateCreated'] =
+				DateTimeHelper::toIso8601($tag->dateCreated);
+			$return['dateUpdated'] =
+				DateTimeHelper::toIso8601($tag->dateUpdated);
+
+			return $this->asJson($return);
+		}
+
+		\Craft::$app->getSession()->setNotice(
+			\Craft::t('app', 'Tag saved.')
+		);
+
+		return $this->redirectToPostedUrl($tag);
+	}
+
+	/**
+	 * @return null|\yii\web\Response
+	 * @throws NotFoundHttpException
+	 * @throws \Throwable
+	 * @throws \yii\web\BadRequestHttpException
+	 */
+	public function actionDelete ()
+	{
+		$this->requirePostRequest();
+		$request = \Craft::$app->request;
+
+		$tagId  = $request->getBodyParam('tagId');
+		$siteId = $request->getBodyParam('siteId');
+
+		$tag = \Craft::$app->tags->getTagById($tagId, $siteId);
+
+		if (!$tag)
+			throw new NotFoundHttpException('Tag not found');
+
+		if (!\Craft::$app->elements->deleteElement($tag))
+		{
+			if ($request->getAcceptsJson())
+				return $this->asJson(['success' => false]);
+
+			\Craft::$app->session->setError(
+				\Craft::t('app', 'Couldn’t delete tag.')
+			);
+
+			// Send the entry back to the template
+			\Craft::$app->getUrlManager()->setRouteParams([
+				'tag' => $tag
+			]);
+
+			return null;
+		}
+
+		if ($request->getAcceptsJson())
+			return $this->asJson(['success' => true]);
+
+		\Craft::$app->session->setNotice(
+			\Craft::t('app', 'Entry tag.')
+		);
+
+		return $this->redirectToPostedUrl($tag);
 	}
 
 }
