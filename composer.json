@@ -1,0 +1,38 @@
+{
+  "name": "ether/tags",
+  "description": "A tag manager for Craft 3",
+  "type": "craft-plugin",
+  "version": "1.0.0-alpha.1",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "tags"
+  ],
+  "support": {
+    "docs": "https://github.com/ethercreative/tags/blob/master/README.md",
+    "issues": "https://github.com/ethercreative/tags/issues"
+  },
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Ether Creative",
+      "homepage": "https://ethercreative.co.uk"
+    }
+  ],
+  "require": {
+    "craftcms/cms": "^3.0.0-RC17"
+  },
+  "autoload": {
+    "psr-4": {
+      "ether\\tagManager\\": "src/"
+    }
+  },
+  "extra": {
+    "name": "Tags",
+    "handle": "tagManager",
+    "changelogUrl": "https://raw.githubusercontent.com/ethercreative/tags/master/CHANGELOG.md",
+    "class": "ether\\tagManager\\TagManager"
+  }
+}

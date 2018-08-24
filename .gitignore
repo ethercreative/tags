@@ -1,0 +1,11 @@
+# COMPOSER
+/vendor
+
+# BUILD FILES
+node_modules/
+yarn-error.log
+
+# MISC FILES
+.cache
+.DS_Store
+.idea
