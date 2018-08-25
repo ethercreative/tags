@@ -11,8 +11,10 @@ namespace ether\tagManager;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\actions\Edit;
+use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterElementActionsEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
 use ether\tagManager\elements\actions\Delete;
 use ether\tagManager\elements\Tag;
@@ -63,6 +65,12 @@ class TagManager extends Plugin
 			[$this, 'onRegisterTagActions']
 		);
 
+		Event::on(
+			Cp::class,
+			Cp::EVENT_REGISTER_CP_NAV_ITEMS,
+			[$this, 'onRegisterCpNavItems']
+		);
+
 	}
 
 	// Craft
@@ -96,6 +104,35 @@ class TagManager extends Plugin
 	{
 		$event->actions[] = Edit::class;
 		$event->actions[] = Delete::class;
+	}
+
+	public function onRegisterCpNavItems (RegisterCpNavItemsEvent $event)
+	{
+		$navItems = $event->navItems;
+		$i = count($navItems);
+
+		$tagsNavItemIndex = null;
+
+		while (--$i)
+		{
+			$item = $navItems[$i];
+			$url = array_key_exists('url', $item) ? $item['url'] : null;
+
+			if ($url === 'tags')
+			{
+				$tagsNavItemIndex = $i;
+				continue;
+			}
+
+			if (in_array($url, ['dashboard', 'entries', 'globals', 'categories']))
+			{
+				$tagsItem = array_splice($navItems, $tagsNavItemIndex, 1);
+				array_splice($navItems, $i + 1, 0, $tagsItem);
+				break;
+			}
+		}
+
+		$event->navItems = $navItems;
 	}
 
 }
