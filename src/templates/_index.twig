@@ -7,12 +7,19 @@
 
 {% block actionButton %}
 	<div class="btngroup">
-		<a href="{{ url('tags/new') }}" class="btn submit add icon">New Tag</a>
+		{% set groups = craft.app.tags.allTagGroups %}
+
+		<a
+			href="{{ url("tags/#{groups[0].handle}/new") }}"
+			class="btn submit add icon"
+		>
+			New Tag
+		</a>
 
 		<div class="btn submit menubtn"></div>
 		<div class="menu">
 			<ul>
-				{% for group in craft.app.tags.allTagGroups %}
+				{% for group in groups %}
 					<li>
 						<a href="{{ url("tags/#{group.handle}/new") }}">
 							{{ group.name }}

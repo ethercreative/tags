@@ -84,12 +84,7 @@ class CpController extends Controller
 				throw new NotFoundHttpException('Tag not found');
 
 			$variables['title'] = $variables['tag']->title;
-
-			$group = $variables['tag']->group;
-			$variables['crumbs'][] = [
-				'label' => $group->name,
-				'url'   => UrlHelper::cpUrl('tags/' . $group->handle),
-			];
+			$variables['group'] = $variables['tag']->group;
 		} else {
 			$variables['tag'] = new Tag();
 			$variables['tag']->siteId  = $variables['site']->id;
@@ -97,6 +92,11 @@ class CpController extends Controller
 
 			$variables['title'] = \Craft::t('app', 'Create a new tag');
 		}
+
+		$variables['crumbs'][] = [
+			'label' => $variables['group']->name,
+			'url'   => UrlHelper::cpUrl('tags/' . $variables['group']->handle),
+		];
 
 		// Urls
 		$variables['nextTagUrl'] = UrlHelper::url(
