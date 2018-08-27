@@ -45,6 +45,11 @@ class Tag extends \craft\elements\Tag
 		return $url;
 	}
 
+	/**
+	 * @return bool
+	 * @throws \Throwable
+	 * @throws \yii\db\Exception
+	 */
 	public function beforeDelete (): bool
 	{
 		if ($this->replaceWith === null)
