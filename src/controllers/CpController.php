@@ -8,12 +8,14 @@
 
 namespace ether\tagManager\controllers;
 
+use craft\base\Element;
+use craft\db\Query;
 use craft\elements\Tag;
 use craft\errors\InvalidElementException;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use ether\tagManager\web\assets\index\TagIndexAsset;
+use ether\tagManager\web\assets\TagIndexAsset;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -299,6 +301,29 @@ class CpController extends Controller
 		);
 
 		return $this->redirectToPostedUrl($tag);
+	}
+
+	/**
+	 * @return \yii\web\Response
+	 * @throws \yii\web\BadRequestHttpException
+	 */
+	public function actionTagSummary ()
+	{
+		$this->requirePostRequest();
+		$this->requireLogin();
+
+		$tagIds = \Craft::$app->request->getRequiredBodyParam('tagId');
+		$summary = [];
+
+		$relationCount = Element::find()->relatedTo($tagIds)->count();
+
+		if ($relationCount)
+			$summary[] =
+				$relationCount === 1
+					? \Craft::t('app', '1 use')
+					: \Craft::t('app', '{c} uses', ['c' => $relationCount]);
+
+		return $this->asJson($summary);
 	}
 
 }

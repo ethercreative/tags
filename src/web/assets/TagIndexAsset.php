@@ -6,7 +6,7 @@
  * @copyright Copyright (c) 2018 Ether Creative
  */
 
-namespace ether\tagManager\web\assets\index;
+namespace ether\tagManager\web\assets;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
