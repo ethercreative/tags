@@ -13,6 +13,7 @@ use craft\errors\InvalidElementException;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use ether\tagManager\web\assets\index\TagIndexAsset;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -24,6 +25,24 @@ use yii\web\ServerErrorHttpException;
  */
 class CpController extends Controller
 {
+
+	/**
+	 * @param string|null $groupHandle
+	 *
+	 * @return \yii\web\Response
+	 * @throws \yii\base\InvalidConfigException
+	 */
+	public function actionIndex (string $groupHandle = null)
+	{
+		$groups = \Craft::$app->tags->getAllTagGroups();
+
+		$this->view->registerAssetBundle(TagIndexAsset::class);
+
+		return $this->renderTemplate(
+			'tag-manager/_index',
+			compact('groupHandle', 'groups')
+		);
+	}
 
 	/**
 	 * @param string      $groupHandle

@@ -86,8 +86,8 @@ class TagManager extends Plugin
 
 	public function onRegisterCpUrlRules (RegisterUrlRulesEvent $event)
 	{
-		$event->rules['tags'] = ['template' => 'tag-manager/_index'];
-		$event->rules['tags/<groupHandle:{handle}>'] = ['template' => 'tag-manager/_index'];
+		$event->rules['tags'] = 'tag-manager/cp/index';
+		$event->rules['tags/<groupHandle:{handle}>'] = 'tag-manager/cp/index';
 
 		$event->rules['tags/<groupHandle:{handle}>/new'] = 'tag-manager/cp/edit';
 		$event->rules['tags/<groupHandle:{handle}>/new/<siteHandle:{handle}>'] = 'tag-manager/cp/edit';

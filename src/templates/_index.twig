@@ -2,37 +2,11 @@
 
 {% set title = "Tags"|t %}
 {% set elementType = 'ether\\tagManager\\elements\\Tag' %}
-
-{% do view.registerAssetBundle("ether\\tagManager\\web\\assets\\index\\TagIndexAsset") %}
-
-{% block actionButton %}
-	<div class="btngroup">
-		{% set groups = craft.app.tags.allTagGroups %}
-
-		<a
-			href="{{ url("tags/#{groups[0].handle}/new") }}"
-			class="btn submit add icon"
-		>
-			New Tag
-		</a>
-
-		<div class="btn submit menubtn"></div>
-		<div class="menu">
-			<ul>
-				{% for group in groups %}
-					<li>
-						<a href="{{ url("tags/#{group.handle}/new") }}">
-							{{ group.name }}
-						</a>
-					</li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
-{% endblock %}
+{% set showStatusMenu = false %}
 
 {% if groupHandle is defined %}
 	{% js %}
 		window.defaultGroupHandle = '{{ groupHandle }}';
+		window.editableTagGroups = {{ groups|json_encode|raw }};
 	{% endjs %}
 {% endif %}
