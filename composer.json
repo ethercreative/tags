@@ -31,7 +31,7 @@
   },
   "extra": {
     "name": "Tags",
-    "handle": "tagManager",
+    "handle": "tag-manager",
     "changelogUrl": "https://raw.githubusercontent.com/ethercreative/tags/master/CHANGELOG.md",
     "class": "ether\\tagManager\\TagManager"
   }
