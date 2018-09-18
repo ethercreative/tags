@@ -101,33 +101,34 @@ class TagManager extends Plugin
 		$event->actions[] = Delete::class;
 	}
 
-	public function onRegisterCpNavItems (RegisterCpNavItemsEvent $event)
-	{
-		$navItems = $event->navItems;
-		$i = count($navItems);
+        public function onRegisterCpNavItems (RegisterCpNavItemsEvent $event)
+        {
+                $navItems = $event->navItems;
+                $i = count($navItems);
 
-		$tagsNavItemIndex = null;
+                $tagsNavItemIndex = null;
 
-		while (--$i)
-		{
-			$item = $navItems[$i];
-			$url = array_key_exists('url', $item) ? $item['url'] : null;
+                foreach($navItems as $key=>$value)
+                {
+                        $item = $navItems[$key];
+                        $url = array_key_exists('url', $item) ? $item['url'] : null;
 
-			if ($url === 'tags')
-			{
-				$tagsNavItemIndex = $i;
-				continue;
-			}
+                        if ($url === 'tags')
+                        {
+                                $tagsNavItemIndex = $key;
+                                continue;
+                        }
 
-			if (in_array($url, ['dashboard', 'entries', 'globals', 'categories']))
-			{
-				$tagsItem = array_splice($navItems, $tagsNavItemIndex, 1);
-				array_splice($navItems, $i + 1, 0, $tagsItem);
-				break;
-			}
-		}
+                        if (in_array($url, ['dashboard', 'entries', 'globals', 'categories']))
+                        {
+                                $tagsItem = array_splice($navItems, $tagsNavItemIndex, 1);
+                                array_splice($navItems, $i + 1, 0, $tagsItem);
+                                break;
+                        }
+                }
 
-		$event->navItems = $navItems;
-	}
+                $event->navItems = $navItems;
+        }
+ 
 
 }
