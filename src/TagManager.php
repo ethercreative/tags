@@ -104,13 +104,14 @@ class TagManager extends Plugin
 	public function onRegisterCpNavItems (RegisterCpNavItemsEvent $event)
 	{
 		$navItems = $event->navItems;
+		$navItemKeys = array_keys($navItems);
 		$i = count($navItems);
 
 		$tagsNavItemIndex = null;
 
 		while (--$i)
 		{
-			$item = $navItems[$i];
+			$item = $navItems[$navItemKeys[$i]];
 			$url = array_key_exists('url', $item) ? $item['url'] : null;
 
 			if ($url === 'tags')
