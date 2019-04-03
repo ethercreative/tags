@@ -1,3 +1,7 @@
+## [Unreleased] 1.0.2
+### Added
+- Added slug field to tag edit page
+
 ## 1.0.1 - 2018-09-27
 ### Fixed
 - Fixed a bug when using Verbb's Control Panel Nav plugin

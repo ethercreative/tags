@@ -121,7 +121,19 @@
 {% endblock %}
 
 {% block details %}
-	<div id="settings" class="meta"></div>
+	<div id="settings" class="meta">
+		{{ forms.textField({
+			label: 'Slug'|t('app'),
+			siteId: tag.siteId,
+			id: 'slug',
+			name: 'slug',
+			autocorrect: false,
+			autocapitalize: false,
+			value: tag.slug,
+			placeholder: 'Enter slug'|t('app'),
+			errors: (tag.getErrors('slug')|merge(tag.getErrors('uri')))
+		}) }}
+	</div>
 
 	{% if tag.id %}
 		<div class="meta read-only">

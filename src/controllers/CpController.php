@@ -207,6 +207,7 @@ class CpController extends Controller
 
 		// Populate
 		$tag->title = $request->getBodyParam('title', $tag->title);
+		$tag->slug = $request->getBodyParam('slug', $tag->slug);
 		$tag->setFieldValuesFromRequest(
 			$request->getParam('fieldsLocation', 'fields')
 		);
