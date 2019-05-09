@@ -1,6 +1,7 @@
 ## [Unreleased] 1.0.3
 ### Changed
-
+- Delete action when editing a tag has been moved to the actions menu.
+- Deleting a tag from the edit page now triggers the replace modal.
 
 ## 1.0.2 - 2019-04-03
 ### Added

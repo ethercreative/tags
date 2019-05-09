@@ -15,8 +15,11 @@ use craft\errors\ElementNotFoundException;
 use craft\errors\InvalidElementException;
 use craft\errors\MissingComponentException;
 use craft\helpers\DateTimeHelper;
+use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use craft\web\View;
+use ether\tagManager\web\assets\TagEditAsset;
 use ether\tagManager\web\assets\TagIndexAsset;
 use Throwable;
 use yii\base\Exception;
@@ -139,6 +142,18 @@ class CpController extends Controller
 		}
 
 		$variables['saveShortcutRedirect'] = $variables['continueEditingUrl'];
+
+		// JS
+		$view = Craft::$app->getView();
+		$view->registerAssetBundle(TagEditAsset::class);
+		$tagIdJs = Json::encode($tagId);
+		$settingsJs = Json::encode([
+			'deleteModalRedirect' => Craft::$app->getSecurity()->hashData('tags'),
+		]);
+		$view->registerJs(
+			'new Craft.TagEdit(' . $tagIdJs . ',' . $settingsJs . ');',
+			View::POS_END
+		);
 
 		return $this->renderTemplate('tag-manager/_edit', $variables);
 	}
