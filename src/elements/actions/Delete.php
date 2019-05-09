@@ -8,11 +8,14 @@
 
 namespace ether\tagManager\elements\actions;
 
+use Craft;
 use craft\base\ElementAction;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
 use ether\tagManager\elements\Tag;
 use ether\tagManager\web\assets\DeleteTagAsset;
+use Throwable;
+use yii\base\InvalidConfigException;
 use yii\db\Exception;
 
 /**
@@ -42,26 +45,26 @@ class Delete extends ElementAction
 
 	public function getTriggerLabel (): string
 	{
-		return \Craft::t('app', 'Delete…');
+		return Craft::t('app', 'Delete…');
 	}
 
 	/**
 	 * @return null|string|void
 	 * @throws \yii\base\Exception
-	 * @throws \yii\base\InvalidConfigException
+	 * @throws InvalidConfigException
 	 */
 	public function getTriggerHtml ()
 	{
 		$type = Json::encode(static::class);
-		$redirect = Json::encode(\Craft::$app->security->hashData('tags'));
+		$redirect = Json::encode(Craft::$app->security->hashData('tags'));
 
 		$js = <<<JS
 /* global Craft */
 !function () {
 	new Craft.ElementActionTrigger({
 		type: $type,
-		batch: true,
-		validateSelection: function () {
+		batch;: true,
+		validateSelection;: function () {
 			return true;
 		},
 		activate: function (selectedItems) {
@@ -81,23 +84,23 @@ class Delete extends ElementAction
 						onSubmit: function() {
 							Craft.elementIndex.submitAction(
 								$type,
-								Garnish.getPostData(modal.\$container)
-							);
+								Garnish.getPostData(modal.;\$container;)
+							)
 							modal.hide();
 							
 							return false;
 						},
 						redirect: $redirect,
-					});
+					})
 				}
 			);
 		}
-	});
+	})
 }();
 JS;
 
-		\Craft::$app->view->registerAssetBundle(DeleteTagAsset::class);
-		\Craft::$app->view->registerJs($js);
+		Craft::$app->view->registerAssetBundle(DeleteTagAsset::class);
+		Craft::$app->view->registerJs($js);
 	}
 
 	/**
@@ -105,7 +108,7 @@ JS;
 	 *
 	 * @return bool
 	 * @throws Exception
-	 * @throws \Throwable
+	 * @throws Throwable
 	 */
 	public function performAction (ElementQueryInterface $query): bool
 	{
@@ -117,7 +120,7 @@ JS;
 
 		if (!empty($this->replaceWith))
 		{
-			$replaceWith = \Craft::$app->getElements()->getElementById(
+			$replaceWith = Craft::$app->getElements()->getElementById(
 				$this->replaceWith,
 				Tag::class,
 				null
@@ -136,11 +139,11 @@ JS;
 		foreach ($tags as $tag)
 		{
 			$tag->replaceWith = $replaceWith;
-			\Craft::$app->elements->deleteElement($tag);
+			Craft::$app->elements->deleteElement($tag);
 		}
 
 		$this->setMessage(
-			\Craft::t('app', 'Tags deleted.')
+			Craft::t('app', 'Tags deleted.')
 		);
 
 		return true;

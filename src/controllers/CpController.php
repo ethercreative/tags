@@ -8,15 +8,22 @@
 
 namespace ether\tagManager\controllers;
 
+use Craft;
 use craft\base\Element;
-use craft\db\Query;
 use craft\elements\Tag;
+use craft\errors\ElementNotFoundException;
 use craft\errors\InvalidElementException;
+use craft\errors\MissingComponentException;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use ether\tagManager\web\assets\TagIndexAsset;
+use Throwable;
+use yii\base\Exception;
+use yii\base\InvalidConfigException;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -31,12 +38,12 @@ class CpController extends Controller
 	/**
 	 * @param string|null $groupHandle
 	 *
-	 * @return \yii\web\Response
-	 * @throws \yii\base\InvalidConfigException
+	 * @return Response
+	 * @throws InvalidConfigException
 	 */
 	public function actionIndex (string $groupHandle = null)
 	{
-		$groups = \Craft::$app->tags->getAllTagGroups();
+		$groups = Craft::$app->tags->getAllTagGroups();
 
 		$this->view->registerAssetBundle(TagIndexAsset::class);
 
@@ -51,7 +58,7 @@ class CpController extends Controller
 	 * @param int|null    $tagId
 	 * @param string|null $siteHandle
 	 *
-	 * @return \yii\web\Response
+	 * @return Response
 	 * @throws NotFoundHttpException
 	 */
 	public function actionEdit (
@@ -68,7 +75,7 @@ class CpController extends Controller
 		if ($siteHandle !== null)
 		{
 			$variables['site'] =
-				\Craft::$app->getSites()->getSiteByHandle($siteHandle);
+				Craft::$app->getSites()->getSiteByHandle($siteHandle);
 
 			if (!$variables['site'])
 				throw new NotFoundHttpException(
@@ -77,12 +84,12 @@ class CpController extends Controller
 		}
 		else
 		{
-			$variables['site'] = \Craft::$app->sites->primarySite;
+			$variables['site'] = Craft::$app->sites->primarySite;
 		}
 
 		// Get Group
 		$variables['group'] =
-			\Craft::$app->tags->getTagGroupByHandle($groupHandle);
+			Craft::$app->tags->getTagGroupByHandle($groupHandle);
 
 		if (empty($variables['group']))
 			throw new NotFoundHttpException('Tag Group not found');
@@ -90,14 +97,14 @@ class CpController extends Controller
 		// Breadcrumbs
 		$variables['crumbs'] = [
 			[
-				'label' => \Craft::t('app', 'Tags'),
+				'label' => Craft::t('app', 'Tags'),
 				'url'   => UrlHelper::url('tags')
 			]
 		];
 
 		// Tag
 		if ($tagId) {
-			$variables['tag'] = \Craft::$app->tags->getTagById(
+			$variables['tag'] = Craft::$app->tags->getTagById(
 				$tagId,
 				$variables['site']->id
 			);
@@ -111,7 +118,7 @@ class CpController extends Controller
 			$variables['tag']->siteId  = $variables['site']->id;
 			$variables['tag']->groupId = $variables['group']->id;
 
-			$variables['title'] = \Craft::t('app', 'Create a new tag');
+			$variables['title'] = Craft::t('app', 'Create a new tag');
 		}
 
 		$variables['crumbs'][] = [
@@ -125,7 +132,7 @@ class CpController extends Controller
 		);
 		$variables['continueEditingUrl'] = 'tags/{group.handle}/{id}';
 
-		if (\Craft::$app->isMultiSite)
+		if (Craft::$app->isMultiSite)
 		{
 			$variables['continueEditingUrl'] .= '/{site.handle}';
 			$variables['nextTagUrl'] .= '/' . $variables['site']->handle;
@@ -137,19 +144,19 @@ class CpController extends Controller
 	}
 
 	/**
-	 * @return null|\yii\web\Response
+	 * @return null|Response
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
-	 * @throws \Throwable
-	 * @throws \craft\errors\ElementNotFoundException
-	 * @throws \craft\errors\MissingComponentException
-	 * @throws \yii\base\Exception
-	 * @throws \yii\web\BadRequestHttpException
+	 * @throws Throwable
+	 * @throws ElementNotFoundException
+	 * @throws MissingComponentException
+	 * @throws Exception
+	 * @throws BadRequestHttpException
 	 */
 	public function actionSave ()
 	{
 		$this->requirePostRequest();
-		$request = \Craft::$app->request;
+		$request = Craft::$app->request;
 
 		$tagId = $request->getBodyParam('tagId');
 		$siteId = $request->getBodyParam('siteId');
@@ -157,7 +164,7 @@ class CpController extends Controller
 		// Get Tag
 		if ($tagId)
 		{
-			$tag = \Craft::$app->tags->getTagById($tagId, $siteId);
+			$tag = Craft::$app->tags->getTagById($tagId, $siteId);
 
 			if (!$tag)
 				throw new NotFoundHttpException('Tag not found');
@@ -165,7 +172,7 @@ class CpController extends Controller
 		else
 		{
 			$tag = new Tag();
-			$tag->groupId = \Craft::$app->request->getRequiredBodyParam('groupId');
+			$tag->groupId = Craft::$app->request->getRequiredBodyParam('groupId');
 
 			if ($siteId)
 				$tag->siteId = $siteId;
@@ -175,7 +182,7 @@ class CpController extends Controller
 		if ((bool) $request->getBodyParam('duplicate'))
 		{
 			try {
-				$tag = \Craft::$app->elements->duplicateElement($tag);
+				$tag = Craft::$app->elements->duplicateElement($tag);
 			} catch (InvalidElementException $e) {
 				/** @var Tag $clone */
 				$clone = $e->element;
@@ -186,19 +193,19 @@ class CpController extends Controller
 						'errors'  => $clone->getErrors(),
 					]);
 
-				\Craft::$app->session->setError(
-					\Craft::t('app', 'Couldn’t duplicate tag.')
+				Craft::$app->session->setError(
+					Craft::t('app', 'Couldn’t duplicate tag.')
 				);
 
 				$tag->addErrors($clone->getErrors());
-				\Craft::$app->urlManager->setRouteParams([
+				Craft::$app->urlManager->setRouteParams([
 					'tag' => $tag,
 				]);
 
 				return null;
-			} catch (\Throwable $e) {
+			} catch (Throwable $e) {
 				throw new ServerErrorHttpException(
-					\Craft::t('app', 'An error occurred when duplicating the tag.'),
+					Craft::t('app', 'An error occurred when duplicating the tag.'),
 					0,
 					$e
 				);
@@ -213,19 +220,19 @@ class CpController extends Controller
 		);
 
 		// Save
-		if (!\Craft::$app->elements->saveElement($tag))
+		if (!Craft::$app->elements->saveElement($tag))
 		{
 			if ($request->getAcceptsJson())
 				return $this->asJson([
 					'errors' => $tag->getErrors(),
 				]);
 
-			\Craft::$app->getSession()->setError(
-				\Craft::t('app', 'Couldn’t save tag.')
+			Craft::$app->getSession()->setError(
+				Craft::t('app', 'Couldn’t save tag.')
 			);
 
 			// Send the entry back to the template
-			\Craft::$app->getUrlManager()->setRouteParams([
+			Craft::$app->getUrlManager()->setRouteParams([
 				'tag' => $tag
 			]);
 
@@ -251,43 +258,43 @@ class CpController extends Controller
 			return $this->asJson($return);
 		}
 
-		\Craft::$app->getSession()->setNotice(
-			\Craft::t('app', 'Tag saved.')
+		Craft::$app->getSession()->setNotice(
+			Craft::t('app', 'Tag saved.')
 		);
 
 		return $this->redirectToPostedUrl($tag);
 	}
 
 	/**
-	 * @return null|\yii\web\Response
+	 * @return null|Response
 	 * @throws NotFoundHttpException
-	 * @throws \Throwable
-	 * @throws \yii\web\BadRequestHttpException
+	 * @throws Throwable
+	 * @throws BadRequestHttpException
 	 */
 	public function actionDelete ()
 	{
 		$this->requirePostRequest();
-		$request = \Craft::$app->request;
+		$request = Craft::$app->request;
 
 		$tagId  = $request->getBodyParam('tagId');
 		$siteId = $request->getBodyParam('siteId');
 
-		$tag = \Craft::$app->tags->getTagById($tagId, $siteId);
+		$tag = Craft::$app->tags->getTagById($tagId, $siteId);
 
 		if (!$tag)
 			throw new NotFoundHttpException('Tag not found');
 
-		if (!\Craft::$app->elements->deleteElement($tag))
+		if (!Craft::$app->elements->deleteElement($tag))
 		{
 			if ($request->getAcceptsJson())
 				return $this->asJson(['success' => false]);
 
-			\Craft::$app->session->setError(
-				\Craft::t('app', 'Couldn’t delete tag.')
+			Craft::$app->session->setError(
+				Craft::t('app', 'Couldn’t delete tag.')
 			);
 
 			// Send the entry back to the template
-			\Craft::$app->getUrlManager()->setRouteParams([
+			Craft::$app->getUrlManager()->setRouteParams([
 				'tag' => $tag
 			]);
 
@@ -297,23 +304,23 @@ class CpController extends Controller
 		if ($request->getAcceptsJson())
 			return $this->asJson(['success' => true]);
 
-		\Craft::$app->session->setNotice(
-			\Craft::t('app', 'Entry tag.')
+		Craft::$app->session->setNotice(
+			Craft::t('app', 'Entry tag.')
 		);
 
 		return $this->redirectToPostedUrl($tag);
 	}
 
 	/**
-	 * @return \yii\web\Response
-	 * @throws \yii\web\BadRequestHttpException
+	 * @return Response
+	 * @throws BadRequestHttpException
 	 */
 	public function actionTagSummary ()
 	{
 		$this->requirePostRequest();
 		$this->requireLogin();
 
-		$tagIds = \Craft::$app->request->getRequiredBodyParam('tagId');
+		$tagIds = Craft::$app->request->getRequiredBodyParam('tagId');
 		$summary = [];
 
 		$relationCount = Element::find()->relatedTo($tagIds)->count();
@@ -321,8 +328,8 @@ class CpController extends Controller
 		if ($relationCount)
 			$summary[] =
 				$relationCount === 1
-					? \Craft::t('app', '1 use')
-					: \Craft::t('app', '{c} uses', ['c' => $relationCount]);
+					? Craft::t('app', '1 use')
+					: Craft::t('app', '{c} uses', ['c' => $relationCount]);
 
 		return $this->asJson($summary);
 	}

@@ -8,7 +8,10 @@
 
 namespace ether\tagManager\elements;
 
+use Craft;
 use craft\helpers\UrlHelper;
+use Throwable;
+use yii\base\InvalidConfigException;
 use yii\db\Query;
 
 /**
@@ -31,7 +34,7 @@ class Tag extends \craft\elements\Tag
 
 	/**
 	 * @return null|string
-	 * @throws \yii\base\InvalidConfigException
+	 * @throws InvalidConfigException
 	 */
 	public function getCpEditUrl ()
 	{
@@ -39,7 +42,7 @@ class Tag extends \craft\elements\Tag
 			'tags/' . $this->group->handle . '/' . $this->id
 		);
 
-		if (\Craft::$app->isMultiSite)
+		if (Craft::$app->isMultiSite)
 			$url .= '/' . $this->getSite()->handle;
 
 		return $url;
@@ -47,8 +50,7 @@ class Tag extends \craft\elements\Tag
 
 	/**
 	 * @return bool
-	 * @throws \Throwable
-	 * @throws \yii\db\Exception
+	 * @throws Throwable
 	 */
 	public function beforeDelete (): bool
 	{
@@ -58,7 +60,7 @@ class Tag extends \craft\elements\Tag
 		if (!parent::beforeDelete())
 			return false;
 
-		$db = \Craft::$app->db;
+		$db = Craft::$app->db;
 		$transaction = $db->beginTransaction();
 		$replaceId = $this->replaceWith->id;
 
@@ -106,7 +108,7 @@ class Tag extends \craft\elements\Tag
 				)->execute();
 
 			$transaction->commit();
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			$transaction->rollBack();
 			throw $e;
 		}
@@ -119,18 +121,18 @@ class Tag extends \craft\elements\Tag
 		$sources = [
 			[
 				'key'   => '*',
-				'label' => \Craft::t('app', 'All Tags'),
+				'label' => Craft::t('app', 'All Tags'),
 			],
 			[
-				'heading' => \Craft::t('app', 'Groups'),
+				'heading' => Craft::t('app', 'Groups'),
 			]
 		];
 
-		foreach (\Craft::$app->getTags()->getAllTagGroups() as $tagGroup)
+		foreach (Craft::$app->getTags()->getAllTagGroups() as $tagGroup)
 		{
 			$sources[] = [
 				'key'      => 'taggroup:' . $tagGroup->id,
-				'label'    => \Craft::t('site', $tagGroup->name),
+				'label'    => Craft::t('site', $tagGroup->name),
 				'data'     => ['handle' => $tagGroup->handle],
 				'criteria' => ['groupId' => $tagGroup->id],
 			];
@@ -142,24 +144,24 @@ class Tag extends \craft\elements\Tag
 	protected static function defineTableAttributes (): array
 	{
 		return [
-			'title'       => ['label' => \Craft::t('app', 'Title')],
-			'group'       => ['label' => \Craft::t('app', 'Group')],
-			'dateCreated' => ['label' => \Craft::t('app', 'Date Created')],
-			'dateUpdated' => ['label' => \Craft::t('app', 'Date Updated')],
+			'title'       => ['label' => Craft::t('app', 'Title')],
+			'group'       => ['label' => Craft::t('app', 'Group')],
+			'dateCreated' => ['label' => Craft::t('app', 'Date Created')],
+			'dateUpdated' => ['label' => Craft::t('app', 'Date Updated')],
 		];
 	}
 
 	protected static function defineSortOptions (): array
 	{
 		return [
-			'title' => \Craft::t('app', 'Title'),
+			'title' => Craft::t('app', 'Title'),
 			[
-				'label'     => \Craft::t('app', 'Date Created'),
+				'label'     => Craft::t('app', 'Date Created'),
 				'orderBy'   => 'elements.dateCreated',
 				'attribute' => 'dateCreated',
 			],
 			[
-				'label'     => \Craft::t('app', 'Date Updated'),
+				'label'     => Craft::t('app', 'Date Updated'),
 				'orderBy'   => 'elements.dateUpdated',
 				'attribute' => 'dateUpdated',
 			]
