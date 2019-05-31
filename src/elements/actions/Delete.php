@@ -64,7 +64,7 @@ class Delete extends ElementAction
 	new Craft.ElementActionTrigger({
 		type: $type,
 		batch: true,
-		validateSelection;: function () {
+		validateSelection: function () {
 			return true;
 		},
 		activate: function (selectedItems) {
