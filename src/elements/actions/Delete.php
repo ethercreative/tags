@@ -84,7 +84,7 @@ class Delete extends ElementAction
 						onSubmit: function() {
 							Craft.elementIndex.submitAction(
 								$type,
-								Garnish.getPostData(modal.;\$container;)
+								Garnish.getPostData(modal.\$container)
 							)
 							modal.hide();
 							
