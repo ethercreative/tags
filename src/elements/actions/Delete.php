@@ -63,8 +63,8 @@ class Delete extends ElementAction
 !function () {
 	new Craft.ElementActionTrigger({
 		type: $type,
-		batch;: true,
-		validateSelection;: function () {
+		batch: true,
+		validateSelection: function () {
 			return true;
 		},
 		activate: function (selectedItems) {
@@ -84,7 +84,7 @@ class Delete extends ElementAction
 						onSubmit: function() {
 							Craft.elementIndex.submitAction(
 								$type,
-								Garnish.getPostData(modal.;\$container;)
+								Garnish.getPostData(modal.\$container)
 							)
 							modal.hide();
 							
