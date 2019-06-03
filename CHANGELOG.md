@@ -1,3 +1,8 @@
+## 1.0.4 - 2019-06-03
+### Fixed
+- Fix JS issues when activating delete tag modal (#9 via @svale)
+- Fix namespace case-sensitivity issue on some systems (#9 via @svale)
+
 ## 1.0.3 - 2019-05-09
 ### Changed
 - Delete action when editing a tag has been moved to the actions menu.
