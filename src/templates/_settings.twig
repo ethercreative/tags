@@ -1,0 +1,9 @@
+{% import "_includes/forms" as forms %}
+
+{{ forms.lightswitchField({
+	label: 'Enable Usage'|t('tag-manager'),
+	instructions: 'Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).'|t('tag-manager'),
+	name: 'enableUsage',
+	on: settings.enableUsage,
+	first: true,
+}) }}

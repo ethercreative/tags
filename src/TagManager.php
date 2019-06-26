@@ -8,6 +8,7 @@
 
 namespace ether\tagManager;
 
+use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\actions\Edit;
@@ -18,6 +19,10 @@ use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
 use ether\tagManager\elements\actions\Delete;
 use ether\tagManager\elements\Tag;
+use ether\tagManager\models\Settings;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 use yii\base\Event;
 
 /**
@@ -34,7 +39,7 @@ class TagManager extends Plugin
 
 	public $schemaVersion = '1.0.0';
 
-	public $hasCpSettings = false;
+	public $hasCpSettings = true;
 
 	public $hasCpSection  = true;
 
@@ -79,6 +84,32 @@ class TagManager extends Plugin
 		$item['url'] = 'tags';
 
 		return $item;
+	}
+
+	protected function createSettingsModel ()
+	{
+		return new Settings();
+	}
+
+	/**
+	 * @return bool|Settings|null
+	 */
+	public function getSettings ()
+	{
+		return parent::getSettings();
+	}
+
+	/**
+	 * @return string|null
+	 * @throws LoaderError
+	 * @throws RuntimeError
+	 * @throws SyntaxError
+	 */
+	protected function settingsHtml ()
+	{
+		return Craft::$app->getView()->renderTemplate('tag-manager/_settings', [
+			'settings' => $this->getSettings(),
+		]);
 	}
 
 	// Events

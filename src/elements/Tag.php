@@ -9,7 +9,10 @@
 namespace ether\tagManager\elements;
 
 use Craft;
+use craft\elements\db\ElementQueryInterface;
 use craft\helpers\UrlHelper;
+use ether\tagManager\elements\db\TagQuery;
+use ether\tagManager\TagManager;
 use Throwable;
 use yii\base\InvalidConfigException;
 use yii\db\Query;
@@ -29,8 +32,15 @@ class Tag extends \craft\elements\Tag
 	/** @var Tag|null */
 	public $replaceWith;
 
+	public $usage;
+
 	// Methods
 	// =========================================================================
+
+	public static function find (): ElementQueryInterface
+	{
+		return new TagQuery(static::class);
+	}
 
 	/**
 	 * @return null|string
@@ -143,18 +153,44 @@ class Tag extends \craft\elements\Tag
 
 	protected static function defineTableAttributes (): array
 	{
-		return [
-			'title'       => ['label' => Craft::t('app', 'Title')],
-			'group'       => ['label' => Craft::t('app', 'Group')],
+		$attrs = [
+			'title' => ['label' => Craft::t('app', 'Title')],
+			'group' => ['label' => Craft::t('app', 'Group')],
+		];
+
+		if (TagManager::getInstance()->getSettings()->enableUsage)
+		{
+			$attrs += [
+				'usage' => ['label' => Craft::t('tag-manager', 'Usage')],
+			];
+		}
+
+		$attrs += [
 			'dateCreated' => ['label' => Craft::t('app', 'Date Created')],
 			'dateUpdated' => ['label' => Craft::t('app', 'Date Updated')],
 		];
+
+		return $attrs;
 	}
 
 	protected static function defineSortOptions (): array
 	{
-		return [
+		$opts = [
 			'title' => Craft::t('app', 'Title'),
+		];
+
+		if (TagManager::getInstance()->getSettings()->enableUsage)
+		{
+			$opts += [
+				[
+					'label'     => Craft::t('app', 'Usage'),
+					'orderBy'   => 'usage',
+					'attribute' => 'usage',
+				],
+			];
+		}
+
+		$opts += [
 			[
 				'label'     => Craft::t('app', 'Date Created'),
 				'orderBy'   => 'elements.dateCreated',
@@ -164,8 +200,10 @@ class Tag extends \craft\elements\Tag
 				'label'     => Craft::t('app', 'Date Updated'),
 				'orderBy'   => 'elements.dateUpdated',
 				'attribute' => 'dateUpdated',
-			]
+			],
 		];
+
+		return $opts;
 	}
 
 }

@@ -1,3 +1,11 @@
+## 1.0.5 - 2019-06-26
+### Added
+- Add 'Usage' column to tags index table (#10)
+- Add setting to enable usage column
+
+### Changed
+- Updated plugin icon
+
 ## 1.0.4 - 2019-06-03
 ### Fixed
 - Fix JS issues when activating delete tag modal (#9 via @svale)
