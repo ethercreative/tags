@@ -20,19 +20,22 @@ use yii\db\Expression;
 class TagQuery extends \craft\elements\db\TagQuery
 {
 
-	protected function beforePrepare (): bool
+	protected function afterPrepare (): bool
 	{
 		if (!TagManager::getInstance()->getSettings()->enableUsage)
-			return parent::beforePrepare();
+			return parent::afterPrepare();
+
+		if (count($this->query->select) === 1 && strtoupper($this->query->select[0]) === 'COUNT(*)')
+			return parent::afterPrepare();
 
 		$getUsage = new Expression(
 			'(SELECT COUNT(*) FROM (SELECT [[r.sourceId]], [[r.sourceSiteId]] FROM {{%relations}} r WHERE [[r.targetId]] = [[elements.id]] GROUP BY [[r.sourceId]], [[r.sourceSiteId]]) as usage) as [[usage]]'
 		);
 
-		$this->addSelect($getUsage);
+		$this->query->addSelect(new Expression('[[subquery.usage]] as [[usage]]'));
 		$this->subQuery->addSelect($getUsage);
 
-		return parent::beforePrepare();
+		return parent::afterPrepare();
 	}
 
 }

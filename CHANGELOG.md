@@ -1,3 +1,7 @@
+## [Unreleased] 1.0.6
+### Fixed
+- Fix issue with pgsql when usage column is enabled
+
 ## 1.0.5 - 2019-06-26
 ### Added
 - Add 'Usage' column to tags index table (#10)
