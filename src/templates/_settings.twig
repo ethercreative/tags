@@ -2,8 +2,9 @@
 
 {{ forms.lightswitchField({
 	label: 'Enable Usage'|t('tag-manager'),
-	instructions: 'Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).'|t('tag-manager'),
+	instructions: '**[PostgreSQL Only]** Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).'|t('tag-manager'),
 	name: 'enableUsage',
-	on: settings.enableUsage,
+	on: craft.app.db.driverName == 'pgsql' and settings.enableUsage,
 	first: true,
+	disabled: craft.app.db.driverName == 'mysql'
 }) }}

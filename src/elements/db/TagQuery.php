@@ -8,6 +8,7 @@
 
 namespace ether\tagManager\elements\db;
 
+use Craft;
 use ether\tagManager\TagManager;
 use yii\db\Expression;
 
@@ -22,6 +23,9 @@ class TagQuery extends \craft\elements\db\TagQuery
 
 	protected function afterPrepare (): bool
 	{
+		if (Craft::$app->getDb()->getDriverName() === 'mysql')
+			return parent::afterPrepare();
+
 		if (!TagManager::getInstance()->getSettings()->enableUsage)
 			return parent::afterPrepare();
 
@@ -29,7 +33,7 @@ class TagQuery extends \craft\elements\db\TagQuery
 			return parent::afterPrepare();
 
 		$getUsage = new Expression(
-			'(SELECT COUNT(*) FROM (SELECT [[r.sourceId]], [[r.sourceSiteId]] FROM {{%relations}} r WHERE [[r.targetId]] = [[elements.id]] GROUP BY [[r.sourceId]], [[r.sourceSiteId]]) as usage) as [[usage]]'
+			'(SELECT COUNT(*) FROM (SELECT [[r.sourceId]], [[r.sourceSiteId]] FROM {{%relations}} r WHERE [[r.targetId]] = [[elements.id]] GROUP BY [[r.sourceId]], [[r.sourceSiteId]]) as [[usage]]) as [[usage]]'
 		);
 
 		$this->query->addSelect(new Expression('[[subquery.usage]] as [[usage]]'));

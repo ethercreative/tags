@@ -9,6 +9,6 @@
 return [
 	'Usage' => 'Usage',
 	'Enable Usage' => 'Enable Usage',
-	'Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).' =>
-		'Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).',
+	'**[PostgreSQL Only]** Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).' =>
+		'**[PostgreSQL Only]** Will enable the usage column in the CP (has no effect on regular tag queries, may be slow on larger sites).',
 ];

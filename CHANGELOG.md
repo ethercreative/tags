@@ -1,6 +1,7 @@
-## [Unreleased] 1.0.6
+## 1.0.6 - 2020-01-15
 ### Fixed
 - Fix issue with pgsql when usage column is enabled
+- Disable usage column on MySQL installs
 
 ## 1.0.5 - 2019-06-26
 ### Added
