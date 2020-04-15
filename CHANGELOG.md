@@ -1,3 +1,11 @@
+## 1.0.7 - 2020-04-15
+### Improved
+- Improved some UI elements to better fit with Craft 3.4
+- Added automatic slug generation when creating a tag
+
+### Fixed
+- Fix JS error when trying to replace a tag (Fixes #13)
+
 ## 1.0.6 - 2020-01-15
 ### Fixed
 - Fix issue with pgsql when usage column is enabled

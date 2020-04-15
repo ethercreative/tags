@@ -111,7 +111,7 @@ Craft.TagsIndex = Craft.BaseElementIndex.extend({
 			for (let i = 0, l = this.editableGroups.length; i < l; ++i) {
 				let group = this.editableGroups[i];
 
-				if (isIndex || group.id !== selectedGroup.id) {
+				if (isIndex || (selectedGroup && group.id !== selectedGroup.id)) {
 					href = this._getGroupTriggerHref(group);
 					label =
 						isIndex

@@ -69,6 +69,16 @@
 					</li>
 				{% endif %}
 			</ul>
+			{% if tag.id %}
+				<hr>
+				<ul>
+					<li>
+						<a id="delete-btn" class="error">
+							{{ 'Delete'|t('app') }}
+						</a>
+					</li>
+				</ul>
+			{% endif %}
 		</div>
 	</div>
 {% endblock %}
@@ -105,7 +115,7 @@
 
 {% block details %}
 	<div id="settings" class="meta">
-		{% if tag.id %}
+		{#{% if tag.id %}
 		<div class="first">
 			<div class="value flex">
 				<div class="flex-grow"></div>
@@ -123,7 +133,7 @@
 				</div>
 			</div>
 		</div>
-		{% endif %}
+		{% endif %}#}
 
 		{{ forms.textField({
 			label: 'Slug'|t('app'),
@@ -134,7 +144,8 @@
 			autocapitalize: false,
 			value: tag.slug,
 			placeholder: 'Enter slug'|t('app'),
-			errors: (tag.getErrors('slug')|merge(tag.getErrors('uri')))
+			errors: (tag.getErrors('slug')|merge(tag.getErrors('uri'))),
+			first: true
 		}) }}
 	</div>
 
@@ -151,3 +162,11 @@
 		</div>
 	{% endif %}
 {% endblock %}
+
+{% if not tag.slug %}
+	{% js %}
+	window.slugGenerator = new Craft.SlugGenerator('#title', '#slug', {
+		charMap: {{ craft.cp.getAsciiCharMap(tag.site.language)|json_encode|raw }}
+    });
+    {% endjs %}
+{% endif %}
