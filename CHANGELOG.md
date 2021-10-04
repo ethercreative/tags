@@ -1,3 +1,7 @@
+## 1.0.8 - 2021-09-04
+### Fixed
+- Fix tags not being listed on index (Fixes #18, via @stevecomrie)
+
 ## 1.0.7 - 2020-04-15
 ### Improved
 - Improved some UI elements to better fit with Craft 3.4
