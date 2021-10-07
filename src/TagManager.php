@@ -10,11 +10,14 @@ namespace ether\tagManager;
 
 use Craft;
 use craft\base\Element;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\elements\actions\Edit;
 use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterElementActionsEvent;
 use craft\events\RegisterUrlRulesEvent;
+use craft\gatsbyhelper\events\RegisterIgnoredTypesEvent;
+use craft\gatsbyhelper\services\Deltas;
 use craft\web\twig\variables\Cp;
 use craft\web\UrlManager;
 use ether\tagManager\elements\actions\Delete;
@@ -24,6 +27,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use yii\base\Event;
+use yii\base\Exception;
 
 /**
  * Class Tags
@@ -71,6 +75,14 @@ class TagManager extends Plugin
 			[$this, 'onRegisterCpNavItems']
 		);
 
+		if (class_exists(Deltas::class)) {
+			Event::on(
+				Deltas::class,
+				Deltas::EVENT_REGISTER_IGNORED_TYPES,
+				[$this, 'onRegisterIgnoredTypes']
+			);
+		}
+
 	}
 
 	// Craft
@@ -86,13 +98,13 @@ class TagManager extends Plugin
 		return $item;
 	}
 
-	protected function createSettingsModel ()
+	protected function createSettingsModel (): Settings
 	{
 		return new Settings();
 	}
 
 	/**
-	 * @return bool|Settings|null
+	 * @return bool|Model|null
 	 */
 	public function getSettings ()
 	{
@@ -103,7 +115,7 @@ class TagManager extends Plugin
 	 * @return string|null
 	 * @throws LoaderError
 	 * @throws RuntimeError
-	 * @throws SyntaxError
+	 * @throws SyntaxError|Exception
 	 */
 	protected function settingsHtml ()
 	{
@@ -160,6 +172,11 @@ class TagManager extends Plugin
 		}
 
 		$event->navItems = $navItems;
+	}
+
+	public function onRegisterIgnoredTypes (RegisterIgnoredTypesEvent $event)
+	{
+		$event->types[] = Tag::class;
 	}
 
 }

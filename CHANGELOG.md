@@ -1,3 +1,7 @@
+## 1.0.9 - 2021-09-07
+### Fixed
+- Fix compatibility issue with Gatsby Helper (Fixes #20)
+
 ## 1.0.8 - 2021-09-04
 ### Fixed
 - Fix tags not being listed on index (Fixes #18, via @stevecomrie)

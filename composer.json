@@ -2,7 +2,7 @@
   "name": "ether/tags",
   "description": "A tag manager for Craft 3",
   "type": "craft-plugin",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "keywords": [
     "craft",
     "cms",
