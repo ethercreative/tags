@@ -1,6 +1,14 @@
 {% extends "_layouts/cp" %}
 {% import "_includes/forms" as forms %}
 
+{% set element = tag %}
+
+{% set form = element.getFieldLayout().createForm(element) %}
+
+{% if tabs is not defined %}
+	{% set tabs = form.getTabMenu() %}
+{% endif %}
+
 {% block contextMenu %}
 	{% if craft.app.getIsMultiSite() %}
 		<div class="btn menubtn sitemenubtn"
@@ -92,25 +100,7 @@
 		<input type="hidden" name="siteId" value="{{ tag.siteId }}">
 	{% endif %}
 
-	<div id="fields">
-		{{ forms.textField({
-			label: 'Title'|t('app'),
-			siteId: tag.siteId,
-			id: 'title',
-			name: 'title',
-			value: tag.title,
-			errors: tag.getErrors('title'),
-			first: true,
-			autofocus: true,
-			required: true,
-			maxlength: 255
-		}) }}
-
-		{% include "_includes/fields" with {
-			fields:  tag.group.getFieldLayout().getFields(),
-			element: tag,
-		} only %}
-	</div>
+	{{ form.render()|raw }}
 {% endblock %}
 
 {% block details %}
