@@ -1,3 +1,7 @@
+## 2.0.0 - 2022-10-31 🎃
+### Changed
+- Update for Craft 4 via @davidwebca
+
 ## 1.0.9 - 2021-09-07
 ### Fixed
 - Fix compatibility issue with Gatsby Helper (Fixes #20)

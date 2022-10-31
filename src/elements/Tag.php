@@ -30,9 +30,8 @@ class Tag extends \craft\elements\Tag
 	// =========================================================================
 
 	/** @var Tag|null */
-	public $replaceWith;
-
-	public $usage;
+	public ?Tag $replaceWith;
+	public ?int $usage;
 
 	// Methods
 	// =========================================================================
@@ -154,7 +153,6 @@ class Tag extends \craft\elements\Tag
 	protected static function defineTableAttributes (): array
 	{
 		$attrs = [
-			'title' => ['label' => Craft::t('app', 'Title')],
 			'group' => ['label' => Craft::t('app', 'Group')],
 		];
 
