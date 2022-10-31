@@ -41,11 +41,11 @@ class TagManager extends Plugin
 	// Properties
 	// =========================================================================
 
-	public $schemaVersion = '1.0.0';
+	public string $schemaVersion = '1.0.0';
 
-	public $hasCpSettings = true;
+	public bool $hasCpSettings = true;
 
-	public $hasCpSection  = true;
+	public bool $hasCpSection  = true;
 
 	// Init
 	// =========================================================================
@@ -88,7 +88,7 @@ class TagManager extends Plugin
 	// Craft
 	// =========================================================================
 
-	public function getCpNavItem ()
+	public function getCpNavItem (): ?array
 	{
 		$item = parent::getCpNavItem();
 
@@ -106,7 +106,7 @@ class TagManager extends Plugin
 	/**
 	 * @return bool|Model|null
 	 */
-	public function getSettings ()
+	public function getSettings (): ?Model
 	{
 		return parent::getSettings();
 	}
@@ -117,7 +117,7 @@ class TagManager extends Plugin
 	 * @throws RuntimeError
 	 * @throws SyntaxError|Exception
 	 */
-	protected function settingsHtml ()
+	protected function settingsHtml (): ?string
 	{
 		return Craft::$app->getView()->renderTemplate('tag-manager/_settings', [
 			'settings' => $this->getSettings(),

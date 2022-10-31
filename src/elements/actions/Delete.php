@@ -53,7 +53,7 @@ class Delete extends ElementAction
 	 * @throws \yii\base\Exception
 	 * @throws InvalidConfigException
 	 */
-	public function getTriggerHtml ()
+	public function getTriggerHtml (): ?string
 	{
 		$type = Json::encode(static::class);
 		$redirect = Json::encode(Craft::$app->security->hashData('tags'));
@@ -101,6 +101,8 @@ JS;
 
 		Craft::$app->view->registerAssetBundle(DeleteTagAsset::class);
 		Craft::$app->view->registerJs($js);
+
+		return '';
 	}
 
 	/**

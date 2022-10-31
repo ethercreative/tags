@@ -37,7 +37,7 @@ class Tag extends \craft\elements\Tag
 	// Methods
 	// =========================================================================
 
-	public static function find (): ElementQueryInterface
+	public static function find (): TagQuery
 	{
 		return new TagQuery(static::class);
 	}
@@ -46,7 +46,7 @@ class Tag extends \craft\elements\Tag
 	 * @return null|string
 	 * @throws InvalidConfigException
 	 */
-	public function getCpEditUrl ()
+	public function getCpEditUrl (): ?string
 	{
 		$url = UrlHelper::cpUrl(
 			'tags/' . $this->group->handle . '/' . $this->id
