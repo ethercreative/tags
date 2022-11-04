@@ -13,6 +13,8 @@ use craft\base\Element;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\elements\actions\Edit;
+use craft\elements\Tag as CraftTagElement;
+use craft\events\ModelEvent;
 use craft\events\RegisterCpNavItemsEvent;
 use craft\events\RegisterElementActionsEvent;
 use craft\events\RegisterUrlRulesEvent;
@@ -82,7 +84,14 @@ class TagManager extends Plugin
 				[$this, 'onRegisterIgnoredTypes']
 			);
 		}
-
+		
+		Event::on(
+			CraftTagElement::class,
+			CraftTagElement::EVENT_AFTER_SAVE,
+			function (ModelEvent $event) {
+				Craft::$app->elements->invalidateCachesForElementType(Tag::class);
+			}
+		);
 	}
 
 	// Craft
